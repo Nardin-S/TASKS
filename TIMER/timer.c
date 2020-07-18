@@ -21,13 +21,18 @@
 void TIMER_Initial(void)
 {
 /***** NORMAL MODE *******/
-	TCCR0 |= 0x00 ;
+/*	TCCR0 |= 0x00 ;
+
+	TIMSK |= 0x01 ;
+
+	SREG  |= 0x80 ;*/
+/***** CTC MODE ********/
+
+	TCCR0 |= 0x08 ;
 
 	TIMSK |= 0x02 ;
 
 	SREG  |= 0x80 ;
-/***** CTC MODE ********/
-	TCCR0 |= 0x08 ;
 
 
 
@@ -55,7 +60,7 @@ void STOP_COUNTING(void)
 
 void GENERATE_DELAY(Uint32 delay_value_ms)
 {
-/*
+ #if NORMAL_MODE
 	Uint32 Tick_Time_us   = PRESCALER/Fosc_in_MEGA ;
 
 	Uint32 Ticks_number = (delay_value_ms*1000) / Tick_Time_us ;
@@ -67,21 +72,25 @@ void GENERATE_DELAY(Uint32 delay_value_ms)
 	TCNT0 = Counter_Initial_value ;
 
 	Num_OverFlow ++ ;
-	*/
-	/**** CTC MODE ******/
 
+	/**** CTC MODE ******/
+#elif CTC_MODE
 	Uint32 Tick_Time_us   = PRESCALER/Fosc_in_MEGA ;
 
-	Uint32 Ticks_number = (delay_value_ms*1000) / Tick_Time_us ;
+	Uint32 MAX_Ticks_number = (10000) / Tick_Time_us ;  //10ms
 
-	TCNT0 = Counter_Initial_value ;
-	OCR0 = Ticks_number - 0x01 ;
+	Uint32 TOTAL_Ticks_Number =  delay_value_ms / Tick_Time_us ;
 
-	//Num_OverFlow =
-	if (TCNT0 == OCR0)
-		Num_OverFlow++;
+	Num_OverFlow =  TOTAL_Ticks_Number /  MAX_Ticks_number ;
+
+	TCNT0 = Counter_Initial_value  ;
+	OCR0 = MAX_Ticks_number - 0x01 ;
 
 
+
+
+
+#endif
 }
 
 /*	ISR(){

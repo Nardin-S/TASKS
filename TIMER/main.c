@@ -19,7 +19,7 @@ int main (void)
 {
 	LED0_initial ();
 	TIMER_Initial();
-	GENERATE_DELAY(30);
+	GENERATE_DELAY(500);
 	START_COUNTING();
 
 	while(1)
@@ -55,8 +55,8 @@ if (count == Num_OverFlow)
 ISR (TIMER0_COMP_vect){
 
 	static Uint32 count =0 ;
-
 	count++;
+
 if (count == Num_OverFlow)
 {
 	TCNT0 = Counter_Initial_value ;
